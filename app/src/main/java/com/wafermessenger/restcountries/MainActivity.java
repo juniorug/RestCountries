@@ -1,6 +1,5 @@
 package com.wafermessenger.restcountries;
 
-
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
 
@@ -23,7 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.wafermessenger.restcountries.models.Item;
+import com.wafermessenger.restcountries.models.Country;
 
 import org.json.JSONArray;
 
@@ -35,12 +33,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemTouch
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private RecyclerView recyclerView;
-    private List<Item> cartList;
-    private CartListAdapter mAdapter;
+    private List<Country> cartList;
+    private CountryListAdapter mAdapter;
     private CoordinatorLayout coordinatorLayout;
 
     // url to fetch menu json
-    private static final String URL = "https://api.androidhive.info/json/menu.json";
+    private static final String URL = "https://vanhack-dot-yamm-track.appspot.com/Redirect?ukey=1S0sz-nfjqiZkG6oUd0KNBiDDd35vQDLhpzvC39k3sX4-0&key=YAMMID-72601611&link=https%3A%2F%2Frestcountries.eu%2Frest%2Fv2%2Fall";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemTouch
         recyclerView = findViewById(R.id.recycler_view);
         coordinatorLayout = findViewById(R.id.coordinator_layout);
         cartList = new ArrayList<>();
-        mAdapter = new CartListAdapter(this, cartList);
+        mAdapter = new CountryListAdapter(this, cartList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -71,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemTouch
 
 
         // making http call and fetching menu json
-        Log.i("myTag", "XXXXXXXXXXXXXx This is my message");
         prepareCart();
 
         ItemTouchHelper.SimpleCallback itemTouchHelperCallback1 = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT | ItemTouchHelper.UP) {
@@ -105,19 +102,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemTouch
                     @Override
                     public void onResponse(JSONArray response) {
                         if (response == null) {
-                            Log.i("myTag", "XXXXXXXXXXXXXx RESPONSE IS NULL");
                             Toast.makeText(getApplicationContext(), "Couldn't fetch the menu! Pleas try again.", Toast.LENGTH_LONG).show();
                             return;
                         }
-                        Log.i("myTag", "XXXXXXXXXXXXXx RESPONSE IS NOOOOOT NULL");
-                        Log.i("myTag", response.toString());
-                        List<Item> items = new Gson().fromJson(response.toString(), new TypeToken<List<Item>>() {
+                        List<Country> countries = new Gson().fromJson(response.toString(), new TypeToken<List<Country>>() {
                         }.getType());
 
-                        // adding items to cart list
+                        // adding countries to cart list
                         cartList.clear();
-                        cartList.addAll(items);
-                        Log.i("myTag", "cartList.size: " + cartList.size());
+                        cartList.addAll(countries);
                         // refreshing recycler view
                         mAdapter.notifyDataSetChanged();
                     }
@@ -135,20 +128,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerItemTouch
 
     /**
      * callback when recycler view is swiped
-     * item will be removed on swiped
+     * Country will be removed on swiped
      * undo option will be provided in snackbar to restore the item
      */
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
-        if (viewHolder instanceof CartListAdapter.MyViewHolder) {
-            // get the removed item name to display it in snack bar
+        if (viewHolder instanceof CountryListAdapter.MyViewHolder) {
+            // get the removed country name to display it in snack bar
             String name = cartList.get(viewHolder.getAdapterPosition()).getName();
 
-            // backup of removed item for undo purpose
-            final Item deletedItem = cartList.get(viewHolder.getAdapterPosition());
+            // backup of removed country for undo purpose
+            final Country deletedItem = cartList.get(viewHolder.getAdapterPosition());
             final int deletedIndex = viewHolder.getAdapterPosition();
 
-            // remove the item from recycler view
+            // remove the country from recycler view
             mAdapter.removeItem(viewHolder.getAdapterPosition());
 
             // showing snack bar with Undo option

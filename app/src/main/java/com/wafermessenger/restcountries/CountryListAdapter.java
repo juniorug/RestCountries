@@ -9,37 +9,35 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.wafermessenger.restcountries.models.Item;
+import com.wafermessenger.restcountries.models.Country;
+import com.wafermessenger.restcountries.models.Currency;
+import com.wafermessenger.restcountries.models.Language;
 
 import java.util.List;
 
 
-public class CartListAdapter extends RecyclerView.Adapter<CartListAdapter.MyViewHolder> {
+public class CountryListAdapter extends RecyclerView.Adapter<CountryListAdapter.MyViewHolder> {
     private Context context;
-    private List<Item> cartList;
+    private List<Country> cartList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView name, description, price;
-        public ImageView thumbnail;
+        public TextView name, currency, language;
         public RelativeLayout viewBackground, viewForeground;
 
         public MyViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.name);
-            description = view.findViewById(R.id.description);
-            price = view.findViewById(R.id.price);
-            thumbnail = view.findViewById(R.id.thumbnail);
+            currency = view.findViewById(R.id.currency);
+            language = view.findViewById(R.id.language);
             viewBackground = view.findViewById(R.id.view_background);
             viewForeground = view.findViewById(R.id.view_foreground);
         }
     }
 
-    public CartListAdapter(Context context, List<Item> cartList) {
+    public CountryListAdapter(Context context, List<Country> cartList) {
         this.context = context;
         this.cartList = cartList;
     }
@@ -54,14 +52,26 @@ public class CartListAdapter extends RecyclerView.Adapter<CartListAdapter.MyView
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, final int position) {
-        final Item item = cartList.get(position);
-        holder.name.setText(item.getName());
-        holder.description.setText(item.getDescription());
-        holder.price.setText(String.valueOf(item.getPrice()));
+        final Country country = cartList.get(position);
+        holder.name.setText(country.getName());
+        holder.currency.setText(preventNullCurrencyName(country.getCurrencies()));
+        holder.language.setText(preventNullLanguageName(country.getLanguages()));
+    }
 
-        Glide.with(context)
-                .load(item.getThumbnail())
-                .into(holder.thumbnail);
+    private String preventNullCurrencyName(List<Currency> currencyList) {
+        if (currencyList.isEmpty()) {
+            return "";
+        } else {
+            return (null == currencyList.get(0).getName() ? "" : currencyList.get(0).getName());
+        }
+    }
+
+    private String preventNullLanguageName(List<Language> languageList) {
+        if (languageList.isEmpty()) {
+            return "";
+        } else {
+            return (null == languageList.get(0).getName() ? "" : languageList.get(0).getName());
+        }
     }
 
     @Override
@@ -72,15 +82,11 @@ public class CartListAdapter extends RecyclerView.Adapter<CartListAdapter.MyView
 
     public void removeItem(int position) {
         cartList.remove(position);
-        // notify the item removed by position
-        // to perform recycler view delete animations
-        // NOTE: don't call notifyDataSetChanged()
         notifyItemRemoved(position);
     }
 
-    public void restoreItem(Item item, int position) {
-        cartList.add(position, item);
-        // notify item added by position
+    public void restoreItem(Country country, int position) {
+        cartList.add(position, country);
         notifyItemInserted(position);
     }
 }
